@@ -46,6 +46,11 @@ class Tagbee_Auto_Proposals_Request implements Tagbee_Request_Interface
      */
     protected $contentMetaKeywords;
 
+    /**
+     * @var string
+     */
+    protected $permalink;
+
     public function __construct($data, $tags, $meta)
     {
         $this->id = !empty(trim($meta['tagbee_api_id'][0])) ? trim($meta['tagbee_api_id'][0]) : null;
@@ -53,6 +58,7 @@ class Tagbee_Auto_Proposals_Request implements Tagbee_Request_Interface
         $this->contentTitle = $data->post_title;
         $this->contentBody = $data->post_content;
         $this->contentCategory = $this->createCategoriesString($data);
+        $this->permalink = get_post_permalink($data->ID);
 
         $this->tags = $tags;
         $this->contentMetaDescription = '';

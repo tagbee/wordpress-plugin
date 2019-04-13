@@ -17,7 +17,9 @@ trait Tagbee_Trait
             'body' => $this->contentBody,
             'category' => $this->contentCategory,
             'meta_description' => $this->contentMetaDescription,
-            'meta_keywords' => $this->contentMetaKeywords
+            'meta_keywords' => $this->contentMetaKeywords,
+            'reference' => 'Wordpress ' . get_bloginfo('version'),
+            'permalink' => $this->permalink
         ];
     }
 
