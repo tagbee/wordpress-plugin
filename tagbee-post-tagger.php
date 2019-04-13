@@ -3,7 +3,7 @@
 Plugin Name:  TagΒee, Automatic Post Tagging
 Plugin URI:   https://developer.wordpress.org/plugins/the-basics/
 Description:  Add Tags to posts
-Version:      1.0.5
+Version:      1.0.6
 Author:       TagΒee Team
 Author URI:   https://tagbee.co
 License:      GPLv3 or later
