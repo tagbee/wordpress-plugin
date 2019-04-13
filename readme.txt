@@ -3,7 +3,7 @@
 Contributors: TagBee team
 Tags: auto tags, posts, seo, tags, tagging
 Requires at least: 3.7
-Tested up to: 5.0.3
+Tested up to: 5.1.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 

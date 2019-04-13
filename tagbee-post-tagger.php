@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 defined('ABSPATH') or die('Wordpress Plugin');
-define('TAGBEE_VERSION', "1.0.5");
+define('TAGBEE_VERSION', "1.0.6");
 define("TAGBEE_NAMESPACE", "tagbee");
 define("TAGBEE_INNER_PROPOSAL_ENDPOINT", "proposals");
 
