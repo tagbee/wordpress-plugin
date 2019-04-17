@@ -3,7 +3,7 @@
 Plugin Name:  TagΒee, Automatic Post Tagging
 Plugin URI:   https://developer.wordpress.org/plugins/the-basics/
 Description:  Add Tags to posts
-Version:      1.0.6
+Version:      1.0.7
 Author:       TagΒee Team
 Author URI:   https://tagbee.co
 License:      GPLv3 or later
@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 defined('ABSPATH') or die('Wordpress Plugin');
-define('TAGBEE_VERSION', "1.0.6");
+define('TAGBEE_VERSION', "1.0.7");
 define("TAGBEE_NAMESPACE", "tagbee");
 define("TAGBEE_INNER_PROPOSAL_ENDPOINT", "proposals");
 
@@ -55,7 +55,7 @@ function register_tagbee_plugin_settings() {
 }
 
 /** Submit Final Post Info and Save Post Meta */
-function tagbee_post_info( $id, $post ) {
+function tagbee_post_info_callback( $id, $post ) {
 
     $id = (int) $id;
 
@@ -94,6 +94,25 @@ function tagbee_post_info( $id, $post ) {
     }
 
     return;
+}
+
+/** Decide if the this is a rest api request */
+function is_api_used() {
+    return defined('REST_REQUEST') && REST_REQUEST;
+}
+
+function tagbee_post_info_rest( $post ) {
+    tagbee_post_info_callback($post->ID, $post);
+}
+
+function tagbee_post_info( $id, $post ) {
+
+    if (is_api_used()) {
+        add_action('rest_after_insert_post', 'tagbee_post_info_rest', 10, 2);
+        return;
+    }
+
+    tagbee_post_info_callback($id, $post);
 }
 
 /** Plugin Settings Page */
