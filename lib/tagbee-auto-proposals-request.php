@@ -88,7 +88,7 @@ class Tagbee_Auto_Proposals_Request implements Tagbee_Request_Interface
      */
     private function validate()
     {
-        if (!trim($this->contentTitle) && trim($this->contentBody)) {
+        if (!trim($this->contentTitle) || !trim($this->contentBody)) {
             throw new Exception('Empty Title or Body');
         }
     }
