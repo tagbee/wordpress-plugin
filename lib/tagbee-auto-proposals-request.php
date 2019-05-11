@@ -51,9 +51,15 @@ class Tagbee_Auto_Proposals_Request implements Tagbee_Request_Interface
      */
     protected $permalink;
 
+    /**
+     * @throws Exception
+     */
     public function __construct($data, $tags, $meta)
     {
-        $this->id = !empty(trim($meta['tagbee_api_id'][0])) ? trim($meta['tagbee_api_id'][0]) : null;
+        $tagBeeApiId = isset($meta['tagbee_api_id']) && isset($meta['tagbee_api_id'][0])
+            ? trim($meta['tagbee_api_id'][0]) : null;
+
+        $this->id = $tagBeeApiId ? $tagBeeApiId : null;
         $this->contentId = $data->ID;
         $this->contentTitle = $data->post_title;
         $this->contentBody = $data->post_content;
@@ -63,6 +69,8 @@ class Tagbee_Auto_Proposals_Request implements Tagbee_Request_Interface
         $this->tags = $tags;
         $this->contentMetaDescription = '';
         $this->contentMetaKeywords = '';
+
+        $this->validate();
     }
 
     public function buildBody()
@@ -73,5 +81,15 @@ class Tagbee_Auto_Proposals_Request implements Tagbee_Request_Interface
             'version' => self::TAGBEE_API_VERSION,
             'tags' => $this->buildRequestTags()
         ];
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function validate()
+    {
+        if (!trim($this->contentTitle) && trim($this->contentBody)) {
+            throw new Exception('Empty Title or Body');
+        }
     }
 }

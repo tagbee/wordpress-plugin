@@ -3,7 +3,7 @@
 Plugin Name:  TagΒee, Automatic Post Tagging
 Plugin URI:   https://developer.wordpress.org/plugins/the-basics/
 Description:  Add Tags to posts
-Version:      1.0.7
+Version:      1.0.8
 Author:       TagΒee Team
 Author URI:   https://tagbee.co
 License:      GPLv3 or later
@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 defined('ABSPATH') or die('Wordpress Plugin');
-define('TAGBEE_VERSION', "1.0.7");
+define('TAGBEE_VERSION', "1.0.8");
 define("TAGBEE_NAMESPACE", "tagbee");
 define("TAGBEE_INNER_PROPOSAL_ENDPOINT", "proposals");
 
@@ -64,17 +64,26 @@ function tagbee_post_info_callback( $id, $post ) {
 
     $client = new Tagbee_Client(get_option('tagbee_api_key'), get_option('tagbee_api_key_secret'));
 
-    $response = $client->postAutoProposals(
-        new Tagbee_Auto_Proposals_Request(
+    try {
+        $autoProposalRequest = new Tagbee_Auto_Proposals_Request(
             $post,
             wp_get_post_tags($id),
             get_post_meta($id)
-        )
-    );
+        );
+    } catch (\Exception $e) {
+        return;
+    }
+
+    $response = $client->postAutoProposals($autoProposalRequest);
 
     if (!is_a($response, WP_Error::class)) {
 
         $response = json_decode($response['body'], true);
+
+        if (!$response || !isset($response['data'])) {
+            return;
+        }
+
         $data = $response['data'];
         $remoteId = $data['id'];
 
@@ -97,7 +106,7 @@ function tagbee_post_info_callback( $id, $post ) {
 }
 
 /** Decide if the this is a rest api request */
-function is_api_used() {
+function tagbee_is_api_used() {
     return defined('REST_REQUEST') && REST_REQUEST;
 }
 
@@ -107,7 +116,7 @@ function tagbee_post_info_rest( $post ) {
 
 function tagbee_post_info( $id, $post ) {
 
-    if (is_api_used()) {
+    if (tagbee_is_api_used()) {
         add_action('rest_after_insert_post', 'tagbee_post_info_rest', 10, 2);
         return;
     }
