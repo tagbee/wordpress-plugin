@@ -2,6 +2,7 @@
 
 require_once('tagbee-auto-proposals-request.php');
 require_once('tagbee-update-tags-request.php');
+require_once('tagbee-rate-limiter-check-request.php');
 
 class Tagbee_Client
 {
@@ -13,6 +14,17 @@ class Tagbee_Client
     {
         $this->apiKey = $apiKey;
         $this->secretKey = $secretKey;
+    }
+
+    /**
+     * @return array|WP_Error
+     */
+    public function rateLimiterCheck(Tagbee_Rate_Limmiter_Check_Request $tagbeeRequest)
+    {
+        return wp_remote_get(
+            'https://tagbee.co/api/rate-limiter/check',
+            $this->requestArguments('GET', $tagbeeRequest)
+        );
     }
 
     /**
@@ -47,7 +59,7 @@ class Tagbee_Client
      */
     protected function requestArguments($method, Tagbee_Request_Interface $tagbeeRequest)
     {
-        $jsonData = json_encode($tagbeeRequest->buildBody());
+        $jsonData = $tagbeeRequest->buildBody() ? json_encode($tagbeeRequest->buildBody()) : '';
 
         return array(
             'method' => $method,
@@ -56,7 +68,7 @@ class Tagbee_Client
                 'Accept'  => 'application/json',
                 'Content-Type'  => 'application/json; charset=utf-8',
                 'X-TagBee-PubKey' => $this->apiKey,
-                'X-TagBee-Signature' => $this->signature($this->secretKey, $jsonData),
+                'X-TagBee-Signature' => $this->signature($this->secretKey, (string) $jsonData),
             ),
             'body' => $jsonData,
             'timeout' => 20

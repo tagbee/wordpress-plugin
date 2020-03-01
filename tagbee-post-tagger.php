@@ -36,6 +36,36 @@ require_once("lib/tagbee-client.php");
 add_action('admin_menu', 'tagbee_admin_menu_actions');
 add_action('admin_init', 'register_tagbee_plugin_settings');
 add_action('save_post', 'tagbee_post_info', 10, 2);
+add_action('admin_notices', 'rate_limit_notice');
+
+/**
+ * Notify user when rate limit is exceeded
+ */
+function rate_limit_notice() {
+    global $pagenow;
+    $client = new Tagbee_Client(get_option('tagbee_api_key'), get_option('tagbee_api_key_secret'));
+    $response = $client->rateLimiterCheck(new Tagbee_Rate_Limmiter_Check_Request());
+
+    if ($pagenow != 'edit.php' && $_GET['page'] != 'TagBee') {
+        return;
+    }
+
+    if (is_wp_error($response)) {
+        return;
+    }
+
+    $body = wp_remote_retrieve_body($response);
+    $responseArray = json_decode($body, true);
+
+    if (isset($responseArray['error'])) {
+        ?>
+        <div class="notice notice-warning is-dismissible"">
+            <p>TagBee: <?php _e($responseArray['error']['message']); ?></p>
+        </div>
+        <?php
+    }
+}
+
 
 /**
  * Admin Menu Action
@@ -81,6 +111,10 @@ function tagbee_post_info_callback( $id, $post ) {
         $response = json_decode($response['body'], true);
 
         if (!$response || !isset($response['data'])) {
+            return;
+        }
+
+        if (isset($response['error'])) {
             return;
         }
 
