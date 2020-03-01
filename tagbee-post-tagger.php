@@ -36,12 +36,12 @@ require_once("lib/tagbee-client.php");
 add_action('admin_menu', 'tagbee_admin_menu_actions');
 add_action('admin_init', 'register_tagbee_plugin_settings');
 add_action('save_post', 'tagbee_post_info', 10, 2);
-add_action('admin_notices', 'rate_limit_notice');
+add_action('admin_notices', 'tagbee_notices');
 
 /**
- * Notify user when rate limit is exceeded
+ * Notify user when there is a TagBee API error
  */
-function rate_limit_notice() {
+function tagbee_notices() {
     global $pagenow;
     $client = new Tagbee_Client(get_option('tagbee_api_key'), get_option('tagbee_api_key_secret'));
     $response = $client->rateLimiterCheck(new Tagbee_Rate_Limmiter_Check_Request());
